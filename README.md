@@ -1,4 +1,4 @@
-# PHP Development Container
+# PHP Development Container Images
 
 An extended PHP development container based on `mcr.microsoft.com/vscode/devcontainers/php`.
 This container enhances the official Microsoft PHP devcontainer with additional extensions and tools for a more comprehensive development environment.
@@ -27,22 +27,25 @@ This container enhances the official Microsoft PHP devcontainer with additional 
 
 ### Development Tools
 
-- MariaDB client
-- PostgreSQL client
+- nvm (Node Version Manager)
 - SQLite3
 - Supervisor
 - ImageMagick
+- MariaDB client
+- PostgreSQL client
 
 ## Usage
 
-1. Create a `.devcontainer` directory in your project root
+1. Create a `.devcontainer/devcontainer.json` file in your project
 2. Copy the configuration examples below to set up your development environment
 3. Open your project in VS Code and click "Reopen in Container" when prompted
 4. The container will automatically start Apache server on port 80
 
 ### Basic Configuration Example
 
-This configuration uses the `features` property to easily install Node.js using the official devcontainer feature. It also includes recommended VS Code extensions and settings for PHP development.
+This configuration uses the `features` property to easily install Node.js using the official devcontainer feature. It also includes recommended VS Code extensions and settings for PHP development. For more information on available features, visit [devcontainer features](https://containers.dev/features).
+
+Create `.devcontainer/devcontainer.json` in your project:
 
 ```json:.devcontainer/devcontainer.json
 {
@@ -50,7 +53,7 @@ This configuration uses the `features` property to easily install Node.js using 
   "image": "ghcr.io/horatjp/php-dev:latest",
   "features": {
     "ghcr.io/devcontainers/features/node:latest": {
-      "version": "18"
+      "version": "20"
     }
   },
   "customizations": {
@@ -85,6 +88,17 @@ This configuration uses the `features` property to easily install Node.js using 
 }
 ```
 
+### nvm (Node Version Manager)
+
+This configuration demonstrates how to install a specific version of Node.js using the `postCreateCommand` property. This is useful when you need to use a specific version of Node.js for your project.
+
+```json:.devcontainer/devcontainer.json
+{
+  // ... other configuration ...
+  "postCreateCommand": "bash -i -c 'nvm install 20 && nvm use 20"
+}
+```
+
 ### Custom Document Root Configuration
 
 This configuration creates a custom document root in the `public` directory. Note that when using this configuration, you can omit the `workspaceFolder` and `workspaceMount` settings as the document root is managed through symbolic links.
@@ -101,7 +115,7 @@ This configuration creates a custom document root in the `public` directory. Not
 
 ### Extended Configuration with Custom Dockerfile
 
-This configuration shows how to extend the container using a custom Dockerfile. In this example, we customize locale and timezone settings, and demonstrate a lightweight approach to install Node.js directly from the official Node.js image, which is faster than using the features property and allows for more customization.
+This configuration demonstrates how to extend the base image with a custom Dockerfile. This is useful when you need to customize the development environment further, such as setting the locale and timezone.
 
 ```json:.devcontainer/devcontainer.json
   "build": {
@@ -113,7 +127,7 @@ This configuration shows how to extend the container using a custom Dockerfile. 
   },
 ```
 
-.devcontainer/Dockerfile
+Create `.devcontainer/Dockerfile` in your project:
 
 ```Dockerfile:.devcontainer/Dockerfile
 FROM  ghcr.io/horatjp/php-dev:latest
@@ -123,12 +137,6 @@ ARG TIME_ZONE=UTC
 
 ENV LANG=${LOCALE}
 ENV TZ=${TIME_ZONE}
-
-COPY --from=node:20 /usr/local/bin/node /usr/local/bin/
-COPY --from=node:20 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
-RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs \
-    && ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
-    && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 RUN : \
     # locale
