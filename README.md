@@ -95,7 +95,7 @@ This configuration demonstrates how to install a specific version of Node.js usi
 ```json:.devcontainer/devcontainer.json
 {
   // ... other configuration ...
-  "postCreateCommand": "bash -i -c 'nvm install 20 && nvm use 20"
+  "postCreateCommand": "bash -i -c 'nvm install 20 && nvm use 20'"
 }
 ```
 
