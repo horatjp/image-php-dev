@@ -122,7 +122,9 @@ This configuration demonstrates how to extend the base image with a custom Docke
     "dockerfile": "Dockerfile",
     "args": {
       "LOCALE": "ja_JP.UTF-8",
-      "TIME_ZONE": "Asia/Tokyo"
+    },
+    "remoteEnv": {
+        "TZ": "Asia/Tokyo"
     }
   },
 ```
@@ -133,18 +135,12 @@ Create `.devcontainer/Dockerfile` in your project:
 FROM  ghcr.io/horatjp/php-dev:latest
 
 ARG LOCALE=en_US.UTF-8
-ARG TIME_ZONE=UTC
 
-ENV LANG=${LOCALE}
-ENV TZ=${TIME_ZONE}
+ENV LANGUAGE=${LOCALE}
+ENV LC_ALL=${LOCALE}
 
 RUN : \
     # locale
     && sed -i -E "s/# (${LOCALE})/\1/" /etc/locale.gen \
-    && locale-gen ${LOCALE} \
-    && dpkg-reconfigure locales \
-    && update-locale LANG=${LOCALE} \
-    # timezone
-    && ln -snf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && echo ${TIME_ZONE} > /etc/timezone \
-    && apt-get clean && rm -rf /var/lib/apt/lists/
+    && locale-gen ${LOCALE}
 ```
